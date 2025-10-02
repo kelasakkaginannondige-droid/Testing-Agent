@@ -9,26 +9,33 @@
   <p>Allow microphone access and start talking!</p>
 
   <script>
-    (async () => {
-      // Replace with your own LiveKit info
-      const url = "wss://jupyter-1v67alm8.livekit.cloud";  // your livekit_url
-      const token = "eyJhbGciOiJIUzI1NiJ9.eyJ2aWRv...";    // your user_token
+ (async () => {
+  const url = "wss://jupyter-1v67alm8.livekit.cloud";
+  const token = "YOUR_USER_TOKEN_HERE";
 
-      const room = new livekit.Room();
+  const room = new livekit.Room();
 
-      await room.connect(url, token);
+  await room.connect(url, token);
 
-      room.on("trackSubscribed", (track) => {
-        if(track.kind === "audio") {
-          const audioEl = document.createElement("audio");
-          audioEl.autoplay = true;
-          audioEl.srcObject = new MediaStream([track.mediaStreamTrack]);
-          document.body.appendChild(audioEl);
-        }
-      });
+  // Subscribe to agent audio
+  room.on("trackSubscribed", (track) => {
+    if(track.kind === "audio") {
+      const audioEl = document.createElement("audio");
+      audioEl.autoplay = true;
+      audioEl.srcObject = new MediaStream([track.mediaStreamTrack]);
+      document.body.appendChild(audioEl);
+    }
+  });
 
-      alert("Connected! Speak into your microphone now.");
-    })();
+  // Capture your microphone and publish
+  const localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  const localTrack = new livekit.LocalAudioTrack(localStream.getAudioTracks()[0]);
+  await room.localParticipant.publishTrack(localTrack);
+
+  alert("Connected! Speak into your microphone now.");
+})();
+
   </script>
 </body>
 </html>
+
