@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LiveKit Agent Test</title>
+  <script src="https://cdn.jsdelivr.net/npm/livekit-client@latest/dist/livekit-client.umd.js"></script>
+</head>
+<body>
+  <h2>Talk to Your Agent</h2>
+  <p>Allow microphone access and start talking!</p>
+
+  <script>
+    (async () => {
+      // Replace with your own LiveKit info
+      const url = "wss://jupyter-1v67alm8.livekit.cloud";  // your livekit_url
+      const token = "eyJhbGciOiJIUzI1NiJ9.eyJ2aWRv...";    // your user_token
+
+      const room = new livekit.Room();
+
+      await room.connect(url, token);
+
+      room.on("trackSubscribed", (track) => {
+        if(track.kind === "audio") {
+          const audioEl = document.createElement("audio");
+          audioEl.autoplay = true;
+          audioEl.srcObject = new MediaStream([track.mediaStreamTrack]);
+          document.body.appendChild(audioEl);
+        }
+      });
+
+      alert("Connected! Speak into your microphone now.");
+    })();
+  </script>
+</body>
+</html>
